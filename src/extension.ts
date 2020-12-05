@@ -1,27 +1,62 @@
-// The module 'vscode' contains the VS Code extensibility API
-// Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
+import { LifxHttp } from './lifx-http';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
+let _Colors: Array<string> = ["#0085d2", "#d2713a", "#e91300"];
+
 export function activate(context: vscode.ExtensionContext) {
-
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "lifxvscode" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('lifxvscode.helloWorld', () => {
-		// The code you place here will be executed every time your command is executed
-
-		// Display a message box to the user
 		vscode.window.showInformationMessage('Hello World from Lifx VS Code!');
-	});
 
+	});
 	context.subscriptions.push(disposable);
+
+	let lifxHttp = new LifxHttp("c4a1105e5a064942f66b7b3182e279a1275395576f213dc9a17269e8a5de5e69", "Nashme");
+
+	lifxHttp.setColor(_Colors[0], 0.2, "");
+
+	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(async (s) => {
+		textEditorTextChanged(s);
+	}));
+
+	context.subscriptions.push(vscode.debug.onDidStartDebugSession(async (s) => {
+		debugStarted(s, lifxHttp);
+	}));
+
+	context.subscriptions.push(vscode.debug.onDidChangeActiveDebugSession(async (s) => {
+		debugActiveSessionChange(s);
+	}));
+
+
+	context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(async (s) => {
+		debugEnded(s, lifxHttp);
+	}));
+
+	context.subscriptions.push(vscode.debug.onDidChangeBreakpoints(async (s) => {
+		changeBreakpoints(s, lifxHttp);
+	}));
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+function textEditorTextChanged(s: vscode.TextDocumentChangeEvent,) {
+	vscode.window.showInformationMessage("wala3at line");
+}
+
+async function debugStarted(s: vscode.DebugSession, lifxHttp: LifxHttp) {
+	// TODO : Set colors from settings
+	await lifxHttp.setColor(_Colors[1], 0.2, "");
+	await lifxHttp.setColor(_Colors[1], 0.5, "|1-5");
+	await lifxHttp.moveEffect();
+}
+
+function debugActiveSessionChange(s: vscode.DebugSession | undefined) {
+	vscode.window.showInformationMessage("lets find this");
+}
+
+async function debugEnded(s: vscode.DebugSession, lifxHttp: LifxHttp) {
+	await lifxHttp.setColor(_Colors[0], 0.2, "");
+}
+
+function changeBreakpoints(s: vscode.BreakpointsChangeEvent, lifxHttp: LifxHttp) {
+	lifxHttp.pulseEffect(_Colors[1], s.added.length);
+}
+
+export function deactivate() { }
