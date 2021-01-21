@@ -4,13 +4,13 @@ Lifx VSCode extenstion connects your Lifx lights with VsCode. The communcation b
 
 ## Features
 
-### Party Mode
+#### Party Mode
 When you acoomplish something cool, you can make your lights do a dance for you.
 
-### Debugging Mode
+#### Debugging Mode
 When you are in debuggin mode, the lights turn to orange with move effect.
 
-### Exception
+#### Exception
 When Exception occurs in debug mode, the lights flash in red.
 
 ## Requirements
