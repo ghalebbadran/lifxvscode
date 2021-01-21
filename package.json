@@ -11,16 +11,32 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:lifxvscode.helloWorld"
+		"onCommand:lifxvscode.helloWorld",
+		"onStartupFinished"
 	],
 	"main": "./out/extension.js",
-	"contributes": {
+	"contributes":{ 
 		"commands": [
 			{
 				"command": "lifxvscode.helloWorld",
 				"title": "Party!"
 			}
-		]
+		],
+		"configuration": {
+			"title": "Lifx Api",
+			"properties": {
+			  "lifxApi.ApiKey": {
+				"type": "string",
+				"default": null,
+				"description": "Your API key from lifx site."
+			  },
+			  "lifxApi.TargetDevice": {
+				"type": "string",
+				"default": null,
+				"description": "Specifies the device or group of devices you want to connect the plugin with."
+			  }
+			}
+		  }
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

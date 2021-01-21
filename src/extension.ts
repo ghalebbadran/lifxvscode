@@ -4,13 +4,21 @@ import { LifxHttp } from './lifx-http';
 let _Colors: Array<string> = ["#0085d2", "#d2713a", "#e91300"];
 
 export function activate(context: vscode.ExtensionContext) {
+	
+	//TODO:: Party Method that makes the lights as a party
 	let disposable = vscode.commands.registerCommand('lifxvscode.helloWorld', () => {
 		vscode.window.showInformationMessage('Hello World from Lifx VS Code!');
-
 	});
+	
+	vscode.window.showInformationMessage('Loaded Extension!');
+
 	context.subscriptions.push(disposable);
 
-	let lifxHttp = new LifxHttp("c4a1105e5a064942f66b7b3182e279a1275395576f213dc9a17269e8a5de5e69", "Nashme");
+	var configs = vscode.workspace.getConfiguration('lifxApi');
+
+	//TODO:: Validate configs are set
+
+	let lifxHttp = new LifxHttp(configs["ApiKey"], configs["TargetDevice"]);
 
 	lifxHttp.setColor(_Colors[0], 0.2, "");
 
