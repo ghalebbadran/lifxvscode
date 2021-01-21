@@ -1,6 +1,6 @@
 # lifxvscode README
 
-This is the README for your extension "lifxvscode". After writing up a brief description, we recommend including the following sections.
+Lifx VSCode extenstion connects your Lifx lights with VsCode. The communcation between VSCode and Lifx lights are done through Lifx cloud (HTTPS).
 
 ## Features
 
@@ -14,7 +14,8 @@ For example if there is an image subfolder under your extension project workspac
 
 ## Requirements
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1- Lifx Beam or Lifx Z.
+2- Personal access token from Lifx site. Can be generated from [here](https://cloud.lifx.com/settings)
 
 ## Extension Settings
 
