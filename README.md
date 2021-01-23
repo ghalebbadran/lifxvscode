@@ -1,33 +1,41 @@
 # lifxvscode README
 
-Lifx VSCode extenstion connects your Lifx lights with VsCode. The communcation between VSCode and Lifx lights are done through Lifx cloud (HTTPS).
+Lifx VSCode extension connects your Lifx lights with VsCode. The communication between VSCode and Lifx lights are done through Lifx LAN API.
+
+## Installation
+After installing the extension make sure to fill the label of the Target Device or the extension will use the first device discovered.
 
 ## Features
 
 #### Party Mode
-When you acoomplish something cool, you can make your lights do a dance for you.
+When you accomplish something cool, you can make your lights do a dance for you.
 
 #### Debugging Mode
-When you are in debuggin mode, the lights turn to orange with move effect.
+When you are in debugging mode, the lights turn to Color[1] with a motion effect.
 
-#### Exception
-When Exception occurs in debug mode, the lights flash in red.
+### Breakpoints Addition
+When you add a breakpoint, the lights will flash once.
 
 ## Requirements
 
 * Lifx Beam or Lifx Z.
-* Personal access token from Lifx site. Can be generated from [here](https://cloud.lifx.com/settings)
+* Should be in the same network that Lifx light is connected to.
 
 ## Extension Settings
 
-* `lifxApi.ApiKey`: personal access token
-* `lifxApi.TargetDevice`: target device name
-
+* `lifxvscode.TargetDevice`: target device name
+* `lifxvscode.Colors`: Colors, Color[0] is used for the default state when VS code runs, Color[1] is used for debugging and breakpoint addition 
 
 ## Release Notes
 
 ### 1.0.0
 
-Initial release of LifxVSCode extension
+The initial release of LifxVSCode extension
+
+## Future Work
+
+* Support HTTP API - again -. was implemented but removed.
+* Set light pulse when EXCEPTION occurs.
+* Enhance the Party mode.
 
 **Enjoy!**

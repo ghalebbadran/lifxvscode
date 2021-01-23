@@ -11,12 +11,17 @@ export function activate(context: vscode.ExtensionContext) {
 
   Lifx.discover()
     .then((device_list) => {
-      device_list.forEach((device) => {
-        if (device.deviceInfo.label == _Configs.get("TargetDevice")) {
-					initalizeExtension(context, device);
-          return;
-        }
-      });
+      if (device_list.length > 0) {
+        device_list.forEach((device) => {
+          if (device.deviceInfo.label == _Configs.get("TargetDevice")) {
+            initalizeExtension(context, device);
+            return;
+          }
+				});
+        initalizeExtension(context, device_list[0]);
+      } else {
+        vscode.window.showErrorMessage("No Lifx device found!");
+      }
     })
     .catch((error) => {
       console.error(error);
@@ -58,15 +63,14 @@ function initalizeExtension(context: vscode.ExtensionContext, device: any) {
     })
   );
 
-	vscode.commands.registerCommand('lifxvscode.party', () => {
-		party();
-	});
+  vscode.commands.registerCommand("lifxvscode.party", () => {
+    party();
+  });
 
-  vscode.window.showInformationMessage("Connected to Lifx!");
+  vscode.window.showInformationMessage(`Connected to Lifx device with name: ${_TargetDevice.deviceInfo.label}`);
 }
 
-function textEditorTextChanged(s: vscode.TextDocumentChangeEvent) {
-}
+function textEditorTextChanged(s: vscode.TextDocumentChangeEvent) {}
 
 async function debugStarted(s: vscode.DebugSession) {
   _TargetDevice.setColor({ color: _Colors[1] });
@@ -77,7 +81,7 @@ async function debugStarted(s: vscode.DebugSession) {
     color: {
       hue: _Colors[1].hue,
       saturation: _Colors[1].saturation,
-      brightness: .8,
+      brightness: 0.8,
       kelvin: 3500,
     },
     duration: 0,
@@ -112,13 +116,13 @@ function changeBreakpoints(s: vscode.BreakpointsChangeEvent) {
 }
 
 function party() {
-	_TargetDevice.lightSetWaveform({
-		transient: 1,
-		color: _Colors[1],
-		period: 3000,
-		cycles: 1,
-		waveform: 1
-	});
+  _TargetDevice.lightSetWaveform({
+    transient: 1,
+    color: _Colors[1],
+    period: 3000,
+    cycles: 1,
+    waveform: 1,
+  });
 }
 
 export function deactivate() {

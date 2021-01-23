@@ -20,12 +20,18 @@ function activate(context) {
     _Colors = _Configs.get("Colors");
     Lifx.discover()
         .then((device_list) => {
-        device_list.forEach((device) => {
-            if (device.deviceInfo.label == _Configs.get("TargetDevice")) {
-                initalizeExtension(context, device);
-                return;
-            }
-        });
+        if (device_list.length > 0) {
+            device_list.forEach((device) => {
+                if (device.deviceInfo.label == _Configs.get("TargetDevice")) {
+                    initalizeExtension(context, device);
+                    return;
+                }
+            });
+            initalizeExtension(context, device_list[0]);
+        }
+        else {
+            vscode.window.showErrorMessage("No Lifx device found!");
+        }
     })
         .catch((error) => {
         console.error(error);
@@ -50,13 +56,12 @@ function initalizeExtension(context, device) {
     context.subscriptions.push(vscode.debug.onDidChangeBreakpoints((s) => __awaiter(this, void 0, void 0, function* () {
         changeBreakpoints(s);
     })));
-    vscode.commands.registerCommand('lifxvscode.party', () => {
+    vscode.commands.registerCommand("lifxvscode.party", () => {
         party();
     });
-    vscode.window.showInformationMessage("Connected to Lifx!");
+    vscode.window.showInformationMessage(`Connected to Lifx device with name: ${_TargetDevice.deviceInfo.label}`);
 }
-function textEditorTextChanged(s) {
-}
+function textEditorTextChanged(s) { }
 function debugStarted(s) {
     return __awaiter(this, void 0, void 0, function* () {
         _TargetDevice.setColor({ color: _Colors[1] });
@@ -66,7 +71,7 @@ function debugStarted(s) {
             color: {
                 hue: _Colors[1].hue,
                 saturation: _Colors[1].saturation,
-                brightness: .8,
+                brightness: 0.8,
                 kelvin: 3500,
             },
             duration: 0,
@@ -104,7 +109,7 @@ function party() {
         color: _Colors[1],
         period: 3000,
         cycles: 1,
-        waveform: 1
+        waveform: 1,
     });
 }
 function deactivate() {
