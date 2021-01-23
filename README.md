@@ -16,6 +16,12 @@ When you are in debugging mode, the lights turn to Color[1] with a motion effect
 ### Breakpoints Addition
 When you add a breakpoint, the lights will flash once.
 
+### Demo
+
+* [Party Mode](https://twitter.com/ghalebbadran/status/1353082216927158287?s=20)
+* [Debuggion Mode](https://twitter.com/ghalebbadran/status/1353082083690864640?s=20)
+* [Breakpoints addition](https://twitter.com/ghalebbadran/status/1353081877113004032?s=20)
+
 ## Requirements
 
 * Lifx Beam or Lifx Z.
