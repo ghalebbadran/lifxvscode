@@ -1,70 +1,126 @@
-import * as vscode from 'vscode';
-import { LifxHttp } from './lifx-http';
+import * as vscode from "vscode";
+const Lifx = require("node-lifx-lan");
 
-let _Colors: Array<string> = ["#0085d2", "#d2713a", "#e91300"];
+let _Configs: vscode.WorkspaceConfiguration;
+let _Colors: any = [];
+let _TargetDevice: any = null;
 
 export function activate(context: vscode.ExtensionContext) {
-	
-	//TODO:: Party Method that makes the lights as a party
-	let disposable = vscode.commands.registerCommand('lifxvscode.helloWorld', () => {
-		vscode.window.showInformationMessage('Hello World from Lifx VS Code!');
+  _Configs = vscode.workspace.getConfiguration("lifxvscode");
+  _Colors = _Configs.get("Colors");
+
+  Lifx.discover()
+    .then((device_list) => {
+      device_list.forEach((device) => {
+        if (device.deviceInfo.label == _Configs.get("TargetDevice")) {
+					initalizeExtension(context, device);
+          return;
+        }
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+function initalizeExtension(context: vscode.ExtensionContext, device: any) {
+  _TargetDevice = device;
+
+  _TargetDevice.setColor({ color: _Colors[0] });
+
+  context.subscriptions.push(
+    vscode.workspace.onDidChangeTextDocument(async (s) => {
+      textEditorTextChanged(s);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.debug.onDidStartDebugSession(async (s) => {
+      debugStarted(s);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.debug.onDidChangeActiveDebugSession(async (s) => {
+      debugActiveSessionChange(s);
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.debug.onDidTerminateDebugSession(async (s) => {
+      debugEnded();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.debug.onDidChangeBreakpoints(async (s) => {
+      changeBreakpoints(s);
+    })
+  );
+
+	vscode.commands.registerCommand('lifxvscode.party', () => {
+		party();
 	});
-	
-	vscode.window.showInformationMessage('Loaded Extension!');
 
-	context.subscriptions.push(disposable);
-
-	var configs = vscode.workspace.getConfiguration('lifxApi');
-
-	//TODO:: Validate configs are set
-
-	let lifxHttp = new LifxHttp(configs["ApiKey"], configs["TargetDevice"]);
-
-	lifxHttp.setColor(_Colors[0], 0.2, "");
-
-	context.subscriptions.push(vscode.workspace.onDidChangeTextDocument(async (s) => {
-		textEditorTextChanged(s);
-	}));
-
-	context.subscriptions.push(vscode.debug.onDidStartDebugSession(async (s) => {
-		debugStarted(s, lifxHttp);
-	}));
-
-	context.subscriptions.push(vscode.debug.onDidChangeActiveDebugSession(async (s) => {
-		debugActiveSessionChange(s);
-	}));
-
-
-	context.subscriptions.push(vscode.debug.onDidTerminateDebugSession(async (s) => {
-		debugEnded(s, lifxHttp);
-	}));
-
-	context.subscriptions.push(vscode.debug.onDidChangeBreakpoints(async (s) => {
-		changeBreakpoints(s, lifxHttp);
-	}));
+  vscode.window.showInformationMessage("Connected to Lifx!");
 }
 
-function textEditorTextChanged(s: vscode.TextDocumentChangeEvent,) {
-	vscode.window.showInformationMessage("wala3at line");
+function textEditorTextChanged(s: vscode.TextDocumentChangeEvent) {
 }
 
-async function debugStarted(s: vscode.DebugSession, lifxHttp: LifxHttp) {
-	// TODO : Set colors from settings
-	await lifxHttp.setColor(_Colors[1], 0.2, "");
-	await lifxHttp.setColor(_Colors[1], 0.5, "|1-5");
-	await lifxHttp.moveEffect();
+async function debugStarted(s: vscode.DebugSession) {
+  _TargetDevice.setColor({ color: _Colors[1] });
+
+  _TargetDevice.multiZoneSetColorZones({
+    start: 0,
+    end: 5,
+    color: {
+      hue: _Colors[1].hue,
+      saturation: _Colors[1].saturation,
+      brightness: .8,
+      kelvin: 3500,
+    },
+    duration: 0,
+    apply: 1,
+  });
+
+  _TargetDevice.multiZoneSetEffect({
+    type: 1,
+    speed: 1000,
+    duration: 0,
+    direction: 1,
+  });
 }
 
-function debugActiveSessionChange(s: vscode.DebugSession | undefined) {
-	vscode.window.showInformationMessage("lets find this");
+function debugActiveSessionChange(s: vscode.DebugSession | undefined) {}
+
+async function debugEnded() {
+  _TargetDevice.setColor({ color: _Colors[0] });
 }
 
-async function debugEnded(s: vscode.DebugSession, lifxHttp: LifxHttp) {
-	await lifxHttp.setColor(_Colors[0], 0.2, "");
+function changeBreakpoints(s: vscode.BreakpointsChangeEvent) {
+  if (s.added.length == 1) {
+    _TargetDevice.lightSetWaveform({
+      transient: 1,
+      color: _Colors[1],
+      period: 600,
+      cycles: 1,
+      waveform: 4,
+      skew_ratio: 0.5,
+    });
+  }
 }
 
-function changeBreakpoints(s: vscode.BreakpointsChangeEvent, lifxHttp: LifxHttp) {
-	lifxHttp.pulseEffect(_Colors[1], s.added.length);
+function party() {
+	_TargetDevice.lightSetWaveform({
+		transient: 1,
+		color: _Colors[1],
+		period: 3000,
+		cycles: 1,
+		waveform: 1
+	});
 }
 
-export function deactivate() { }
+export function deactivate() {
+  debugEnded();
+}
