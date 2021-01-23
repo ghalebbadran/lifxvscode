@@ -39,3 +39,4 @@ dist/**/*
 
 # ignore yarn.lock
 yarn.lock
+lifxvscode-1.0.0.vsix
