@@ -2,6 +2,7 @@
   "name": "lifxvscode",
   "displayName": "Lifx VS Code",
   "description": "Lifx integration with VS Code",
+  "publisher": "agb",
   "version": "1.0.0",
   "engines": {
     "vscode": "^1.46.0"
